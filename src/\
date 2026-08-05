@@ -11,21 +11,18 @@ const angle_differential: f32 = 360 / steps;
 pub fn main() void {
     var gpa: Allocator(.{}) = .init;
     const allocator = gpa.allocator();
-    defer {
-        _ = gpa.deinit();
-    }
+    defer _ = gpa.deinit();
 
     const jacobian = jacobianMatrix(allocator, 3) catch |err| {
         std.debug.print("Error: {}\n", .{err});
         return;
     };
-    defer allocator.free(jacobian);
 
     for (0..jacobian.len) |idx| {
-        jacobian[idx] = @floatFromInt(idx);
+        jacobian[idx] = @as(f64, idx);
     }
 
-    var robot_arm: Arm = Arm{};
+    var robot_arm: Arm = Arm();
     robot_arm.print();
 
     std.debug.print("Hello, {s}!\n", .{"World"});
