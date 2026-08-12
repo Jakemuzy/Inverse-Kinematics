@@ -8,7 +8,7 @@ const expect = std.testing.expect;
 const steps: u16 = 7200;
 const angle_differential: f32 = 360 / steps;
 
-pub fn main() void {
+pub fn main() !void {
     var gpa: Allocator(.{}) = .init;
     const allocator = gpa.allocator();
     defer {
@@ -28,7 +28,12 @@ pub fn main() void {
     var robot_arm: Arm = Arm{};
     robot_arm.print();
 
-    std.debug.print("Hello, {s}!\n", .{"World"});
+    std.debug.print("--------------------------------\n", .{});
+
+    // std.debug.print("Hello, {s}!\n", .{"World"});
+    var arm2: Arm = try Arm.init(allocator, &[_]usize{ 1, 2, 3, 1 });
+    defer arm2.deinit(allocator);
+    arm2.print();
 }
 
 fn jacobianMatrix(allocator: std.mem.Allocator, axes: u8) ![]f64 {

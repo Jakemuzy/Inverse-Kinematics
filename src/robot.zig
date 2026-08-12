@@ -5,6 +5,8 @@ const joints: u8 = 2;
 const links: u8 = 3;
 
 pub const Link = struct {
+    const Self = @This();
+
     pos: @Vector(3, f64) = .{ 0, 0, 0 },
     dir: @Vector(3, f64) = .{ 1, 0, 0 },
 
@@ -25,16 +27,33 @@ pub const Arm = struct {
         Link{ .pos = .{ 2, 0, 0 }, .dir = .{ 1, 0, 0 }, .length = 1 },
     },
 
-    fn init() void {}
+    // Always starts at the end of last link
+    end_effector: @Vector(3, f64) = .{ 3, 0, 0 },
 
-    fn deinit() void {}
+    pub fn init(allocator: std.mem.Allocator, _lengths: []const usize) !Arm {
+        var offset: f64 = 0;
 
-    fn iter() void {}
+        var _links: []Link = try allocator.alloc(Link, _lengths.len);
+
+        for (0.._lengths.len) |idx| {
+            _links[idx] = Link{ .pos = .{ offset, 0, 0 }, .dir = .{ 1, 0, 0 }, .length = @as(u32, @intCast(_lengths[idx])) };
+
+            offset += @floatFromInt(_lengths[idx]);
+        }
+
+        return .{ .links = _links, .end_effector = .{ offset, 0, 0 } };
+    }
+
+    pub fn deinit(self: *Arm, allocator: std.mem.Allocator) void {
+        allocator.free(self.links);
+    }
+
+    pub fn iter() void {}
 
     pub fn print(self: Self) void {
-        std.debug.print("Link 1:\n\tPOS: ({})\n\tDIR:({})\n\tLENGTH: {}\n\n", .{ self.links[0].pos, self.links[0].dir, self.links[0].length });
-        std.debug.print("Link 2:\n\tPOS: ({})\n\tDIR:({})\n\tLENGTH: {}\n\n", .{ self.links[1].pos, self.links[1].dir, self.links[1].length });
-        std.debug.print("Link 3:\n\tPOS: ({})\n\tDIR:({})\n\tLENGTH: {}\n\n", .{ self.links[2].pos, self.links[2].dir, self.links[2].length });
+        for (self.links, 0..) |link, idx| {
+            std.debug.print("Link {}:\n\tPOS: ({})\n\tDIR:({})\n\tLEN{}\n\n", .{ idx, link.pos, link.dir, link.length });
+        }
     }
 };
 
