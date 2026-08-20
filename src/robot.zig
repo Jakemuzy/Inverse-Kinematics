@@ -20,15 +20,9 @@ pub const Link = struct {
 pub const Arm = struct {
     const Self = @This();
 
-    // Could remove dir and length since already default init
-    links: []const Link = &.{
-        Link{ .pos = .{ 0, 0, 0 }, .dir = .{ 1, 0, 0 }, .length = 1 },
-        Link{ .pos = .{ 1, 0, 0 }, .dir = .{ 1, 0, 0 }, .length = 1 },
-        Link{ .pos = .{ 2, 0, 0 }, .dir = .{ 1, 0, 0 }, .length = 1 },
-    },
-
-    // Always starts at the end of last link
-    end_effector: @Vector(3, f64) = .{ 3, 0, 0 },
+    movement_func: *const fn (*Arm) void = undefined,
+    links: []Link = undefined,
+    end_effector: @Vector(3, f64) = undefined,
 
     pub fn init(allocator: std.mem.Allocator, _lengths: []const usize) !Arm {
         var offset: f64 = 0;
@@ -59,3 +53,5 @@ pub const Arm = struct {
 
 // TEST check links whether or not pos and dir undefined
 // TODO: look into std.gpu
+// TODO: Arm should have an async function that is called at init. This function will constantly move towards the end effector until it is at the position.
+// Could do this via passing a function pointer (for cylcic or jacobian) to the init function

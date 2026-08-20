@@ -3,6 +3,8 @@ const robot = @import("robot.zig");
 const Arm = robot.Arm;
 const Allocator = std.heap.DebugAllocator;
 
+// oO0(entry)0Oo
+
 const expect = std.testing.expect;
 
 const steps: u16 = 7200;
@@ -24,11 +26,6 @@ pub fn main() !void {
     for (0..jacobian.len) |idx| {
         jacobian[idx] = @floatFromInt(idx);
     }
-
-    var robot_arm: Arm = Arm{};
-    robot_arm.print();
-
-    std.debug.print("--------------------------------\n", .{});
 
     // std.debug.print("Hello, {s}!\n", .{"World"});
     var arm2: Arm = try Arm.init(allocator, &[_]usize{ 1, 2, 3, 1 });
